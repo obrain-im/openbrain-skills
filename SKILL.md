@@ -1,6 +1,6 @@
 ---
 name: open-brain
-description: Work with Open Brain, an agent registry, local daemon, and service discovery platform. Use when Codex needs to initialize an OpenBrain workspace, log in or inspect the CLI daemon, register OpenCode/A2A agents, expose REST/OpenAPI services through an agent, maintain Open Brain CLI config, reload agent runtimes, or debug Open Brain gateway connectivity.
+description: Work with Open Brain, an agent registry, local daemon, and service discovery platform. Use when Codex needs to initialize an OpenBrain workspace, log in or inspect the CLI daemon, register OpenCode/A2A agents, expose REST/OpenAPI services through an agent, maintain Open Brain CLI config, schedule daemon-managed agent runtime reloads, or debug Open Brain gateway connectivity.
 ---
 
 # Open Brain
@@ -14,7 +14,7 @@ Use this skill to connect an agent-maintained workspace to Open Brain. Open Brai
 1. Inspect the current repo before changing anything:
    - Find existing REST services, OpenAPI specs, ports, and startup commands.
 
-2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register an agent, expose a service, reload a runtime, or inspect gateway status.
+2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register an agent, expose a service, schedule a daemon-managed runtime reload, or inspect gateway status.
    - If `obrain` is not available, install it with `bun install -g @obrain/cli` when the user allows dependency installation.
    - Prefer `obrain ...` for normal usage.
    - Read `references/cli.md` before running login, daemon, registration, service, reload, or debug commands.
@@ -22,15 +22,16 @@ Use this skill to connect an agent-maintained workspace to Open Brain. Open Brai
    - When initializing a workspace, automatically generate missing default parameters instead of asking the user for every value. Use the rules in `references/cli.md`.
 
 3. Keep workspace service registration explicit:
-   - Prefer `obrain agent service add <openapi-url>` for a registered agent when updating gateway-visible service state.
+   - Prefer `obrain agent service register` for a registered agent when updating gateway-visible service state.
    - Use a reachable OpenAPI document URL, such as `http://localhost:<port>/openapi.json`.
    - Do not register guessed endpoints; verify the service URL before adding it.
 
-4. Register or reload the agent after service config changes:
+4. Register agents or reload daemon-managed runtimes after discovery changes:
    - For an OpenCode runtime, register with `agent register --runtime opencode`.
    - Always pass `--name <assistant-name>` when registering. Randomly generate a friendly assistant name with exactly two syllables, such as `Milo`, `Nora`, `Kira`, or `Luma`; do not derive it from the repository or service name unless the user provides a name.
    - For a local service with an agent card, register using the card URL/path plus `--local-url` as appropriate.
-   - Use `agent service add <url>` to attach or replace a service URL on an already registered local-device agent.
+   - Use `agent service register` to attach or replace service definitions on an already registered local-device agent.
+   - Use `agent reload [local-url]` only for daemon-managed runtimes; it schedules a delayed runtime restart and coalesces duplicate requests.
    - Run `status`, `agent list`, `agent describe`, and when needed `debug ws` to confirm the daemon, connector, gateway, and agent are healthy.
 
 ## Workspace Initialization Defaults

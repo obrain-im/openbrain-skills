@@ -179,7 +179,7 @@ If none of these are available, registration fails.
 
 ## Agent Runtime Reload
 
-Reload daemon-managed runtimes when runtime discovery state must be refreshed, such as after adding a skill:
+Schedule a delayed reload of daemon-managed runtimes when runtime discovery state must be refreshed, such as after adding a skill:
 
 ```bash
 obrain agent reload

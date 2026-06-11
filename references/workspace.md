@@ -12,7 +12,7 @@ An OpenBrain workspace is code maintained by an agent. The workspace should cont
 2. Identify the REST services the workspace owns.
 3. Verify each service has a reachable OpenAPI document.
 4. Update service registration through `obrain agent service register` when the agent is already registered.
-5. Register or reload the agent after service configuration, runtime URL, or OpenAPI exposure changes.
+5. Register the agent after discovery state changes, and reload daemon-managed runtimes when runtime process state must be refreshed.
 6. Verify with `obrain status`, `obrain agent list`, `obrain agent describe <agent-id>`, and `obrain debug ws` when connectivity is uncertain.
 
 ## API Boundary
@@ -100,5 +100,5 @@ Treat the task as complete only after:
 1. Relevant code changes are implemented and verified.
 2. OpenAPI exposure matches the running service.
 3. Open Brain service registration reflects the reachable service schema through `agent service register`.
-4. The agent has been registered or reloaded when discovery state changed.
+4. The agent has been registered when discovery state changed, or the daemon-managed runtime has been reloaded when runtime process state changed.
 5. The gateway-visible state has been checked with CLI status or agent inspection commands; use `debug ws` and `~/.openbrain/cli.log` when connector health is part of the task.
