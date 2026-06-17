@@ -1,32 +1,42 @@
 ---
 name: open-brain
-description: Work with Open Brain, an agent registry, local daemon, and service discovery platform. Use when Codex needs to initialize an OpenBrain workspace, log in or inspect the CLI daemon, register OpenCode/A2A agents, expose REST/OpenAPI services through an agent, maintain Open Brain CLI config, schedule daemon-managed agent runtime reloads, or debug Open Brain gateway connectivity.
+description: Work with Open Brain workspaces, agent-owned codebases, the Open Brain CLI daemon, and service discovery. Use when initializing or maintaining an OpenBrain workspace; inspecting and modifying an existing codebase so its REST services, tests, startup commands, and OpenAPI contracts are correct; registering OpenCode/A2A agents; exposing or updating REST/OpenAPI services through an agent; maintaining Open Brain CLI config; scheduling daemon-managed agent runtime reloads; or debugging Open Brain gateway connectivity.
 ---
-
 # Open Brain
 
 ## Overview
 
-Use this skill to connect an agent-maintained workspace to Open Brain. Open Brain lets local agents register with a gateway, keep a daemon-backed websocket connector alive, expose A2A agent cards, and attach REST/OpenAPI services that the gateway can call or convert into GraphQL.
+Use this skill to maintain an agent-owned OpenBrain workspace and connect it to Open Brain. Open Brain lets local agents register with a gateway, keep a daemon-backed websocket connector alive, expose A2A agent cards, and attach REST/OpenAPI services that the gateway can call or convert into GraphQL.
+
+Codebase maintenance is a first-class responsibility for this skill: read the existing repository conventions, keep deterministic service behavior in code, preserve the API boundary between AI orchestration and REST services, update tests and startup paths when behavior changes, and make service discovery state match the code that actually runs.
 
 ## Core Workflow
 
 1. Inspect the current repo before changing anything:
-   - Find existing REST services, OpenAPI specs, ports, and startup commands.
 
+   - Read local agent/developer instructions, package metadata, service entrypoints, tests, and configuration files.
+   - Find existing REST services, OpenAPI specs, ports, startup commands, and service registration metadata.
+   - Identify the smallest code changes needed to make the workspace buildable, testable, and discoverable without replacing established project patterns.
 2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register an agent, expose a service, schedule a daemon-managed runtime reload, or inspect gateway status.
+
    - If `obrain` is not available, install it with `bun install -g @obrain/cli` when the user allows dependency installation.
    - Prefer `obrain ...` for normal usage.
    - Read `references/cli.md` before running login, daemon, registration, service, reload, or debug commands.
    - Read `references/workspace.md` before maintaining workspace code or registering services discovered from a workspace.
    - When initializing a workspace, automatically generate missing default parameters instead of asking the user for every value. Use the rules in `references/cli.md`.
+3. Maintain the workspace code before updating gateway-visible state:
 
-3. Keep workspace service registration explicit:
+   - Keep REST services deterministic, resource-oriented, validated, and covered by focused tests or smoke checks.
+   - Add or repair OpenAPI exposure using the workspace's existing framework and tooling.
+   - Update package scripts, env examples, Docker/dev-server config, or service metadata when ports or startup behavior change.
+   - Verify the service locally before treating it as ready for Open Brain registration.
+4. Keep workspace service registration explicit:
+
    - Prefer `obrain agent service register` for a registered agent when updating gateway-visible service state.
    - Use a reachable OpenAPI document URL, such as `http://localhost:<port>/openapi.json`.
    - Do not register guessed endpoints; verify the service URL before adding it.
+5. Register agents or reload daemon-managed runtimes after discovery changes:
 
-4. Register agents or reload daemon-managed runtimes after discovery changes:
    - For an OpenCode runtime, register with `agent register --runtime opencode`.
    - Always pass `--name <assistant-name>` when registering. Randomly generate a friendly assistant name with exactly two syllables, such as `Milo`, `Nora`, `Kira`, or `Luma`; do not derive it from the repository or service name unless the user provides a name.
    - For a local service with an agent card, register using the card URL/path plus `--local-url` as appropriate.
