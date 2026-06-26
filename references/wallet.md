@@ -4,11 +4,13 @@ Use this reference before running Open Brain wallet commands or explaining walle
 
 ## Overview
 
-Open Brain wallet is an ERC-7715-based agent wallet. The Open Brain CLI maintains a local encrypted EVM crypto wallet under the Open Brain config directory; `obrain login` initializes or reuses this wallet.
+Open Brain wallet is an ERC-7715-based agent wallet. The Open Brain CLI maintains a local encrypted EVM crypto wallet under the Open Brain config directory; `obrain login` initializes or reuses this wallet. This wallet is fully controlled by the agent.
 
-The agent wallet can sign messages and submit approved transfers, swaps, or other transactions, but it does not custody user assets by itself. Asset movement requires authorization from the user's main wallet. A permission grants the agent wallet the ability to use up to a specified amount of an asset within a specified time window.
+The agent wallet can sign messages and submit transfers, swaps, or other transactions from this wallet, but it does not custody user assets by itself. Asset movement requires authorization from the user's main wallet. The agent can initiate an approve request through `obrain`; the user must then review and complete the approve action on the OpenBrain platform. A permission grants the agent wallet the ability to use up to a specified amount of an asset within a specified time window.
 
 Before operating on assets, check whether an active permission exists for the asset and whether the remaining quota is sufficient. If no permission exists, or the quota is insufficient, request permission first. Only submit the transfer or swap after the permission is active and sufficient.
+
+Describe permission approval as happening on the OpenBrain platform: the user reviews the pending approve record and completes the approve action there.
 
 ## Commands
 
@@ -71,6 +73,8 @@ For transfer or swap commands:
    obrain wallet permission request <subject> <quota> <hour|day|week|month> [--agent-id <agent-id>]
    ```
 
+   Tell the user this starts an OpenBrain approve request for the specified asset, quota, and time window. The user should review the pending approve record on the OpenBrain platform and complete the approve action there.
+
 4. Inspect the permission if needed:
 
    ```bash
@@ -82,5 +86,7 @@ For transfer or swap commands:
 7. Pass `--rpc-url` when the chain has no built-in RPC URL or the default RPC is unsuitable.
 
 Wallet operations are funds-sensitive. Be conservative: verify asset, chain, amount, recipient, quota, and slippage before submitting a transaction.
+
+The agent's control of the wallet does not bypass permission requirements or user approval for moving user-authorized assets.
 
 If a wallet command fails, read the printed error before retrying. Swap failures include the current slippage and may suggest retrying with a higher `--slippage-bps` when price limits or route movement are likely.

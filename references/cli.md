@@ -26,12 +26,13 @@ obrain status
 obrain restart
 obrain logout
 obrain init workspace --name <name> [--repo <git-url>]
+obrain skill update [path]
 obrain agent register [agent-card-url-or-path] [--card <path>] [--local-url <url>] [--runtime opencode] [--token <jwt>] [--url <login-page-url>] [--port <number>] [--creation-id <id>] [--name <name>] [--description <text>]
 obrain agent list
 obrain agent describe <agent-id>
+obrain agent rename <agent-id> --name="new name" --describe="new desc"
 obrain agent reload [local-url]
 obrain agent service register [--agent-id <agent-id>]
-obrain agent delete <agent-id>
 obrain wallet info
 obrain wallet sign-message [message] [--file <path>] [--agent-id <agent-id>]
 obrain wallet permission request <subject> <quota> <hour|day|week|month> [--agent-id <agent-id>]
@@ -92,6 +93,18 @@ Useful environment variables:
 `obrain status` prints login state, user ID, device ID, gateway URL, log path, daemon PID, socket path, connector connection state, and registered agent count.
 
 `obrain restart` stops and restarts the background daemon, then attempts to re-associate the local wallet with agents registered on the current device. `obrain logout` clears token, user ID, and device ID from `gateway.json` and reconnects the daemon.
+
+## Skill Update
+
+Update the installed OpenBrain skill:
+
+```bash
+obrain skill update [path]
+```
+
+`path` is the skills directory to update. When omitted, `~`, or `~/.agents/skills`, the CLI updates `~/.agents/skills/open-brain`. For other values, the CLI resolves `~/...` relative to the home directory and other paths relative to the current working directory.
+
+The command removes and recreates the target `open-brain` skill directory from the OpenBrain skill repository, then prints the synced path and number of files updated.
 
 ## Workspace Initialization
 
@@ -156,6 +169,12 @@ Register a local agent with explicit card and URL:
 obrain agent register --card <agent-card-path> --local-url <local-agent-url>
 ```
 
+Rename an existing agent:
+
+```bash
+obrain agent rename <agent-id> --name="new name" --describe="new desc"
+```
+
 The CLI prints the agent ID, name, optional card URL, local URL, gateway URL, wallet address, and optional creation ID after successful registration.
 
 Registration behavior:
@@ -164,7 +183,7 @@ Registration behavior:
 - Runtime registration starts or reuses a daemon-managed OpenCode A2A runtime, fetches the runtime card at `http://localhost:<port>/.well-known/agent-card.json`, registers the derived local URL with the remote gateway, associates the local wallet with the agent, refreshes the gateway card, and reconnects the daemon.
 - `agent register <input>` treats the positional as an A2A card location unless `--runtime` is set.
 - `agent register --card <path> --local-url <url>` registers an already running local agent; the card path is used only for preview/metadata, while the local URL is registered.
-- `agent delete <agent-id>` removes the remote agent and stops a daemon-managed runtime when its local URL is managed by this daemon.
+- `agent rename <agent-id>` updates an existing remote agent's display name and description. Use `--name="new name"` for the new name and `--describe="new desc"` for the new description.
 
 ## Agent Card URL Handling
 

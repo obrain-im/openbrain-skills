@@ -1,6 +1,6 @@
 ---
 name: open-brain
-description: Work with Open Brain workspaces, agent-owned codebases, the Open Brain CLI daemon, service discovery, and crypto wallet operations. Use when initializing or maintaining an OpenBrain workspace; inspecting and modifying an existing codebase so its REST services, tests, startup commands, and OpenAPI contracts are correct; registering OpenCode/A2A agents; exposing or updating REST/OpenAPI services through an agent; maintaining Open Brain CLI config; managing the local Open Brain crypto wallet; requesting wallet permissions; signing messages; submitting wallet transfers, swaps, or transactions; scheduling daemon-managed agent runtime reloads; or debugging Open Brain gateway connectivity.
+description: Work with Open Brain workspaces, agent-owned codebases, the Open Brain CLI daemon, service discovery, and crypto wallet operations. Use when initializing or maintaining an OpenBrain workspace; inspecting and modifying an existing codebase so its REST services, tests, startup commands, and OpenAPI contracts are correct; registering or renaming OpenCode/A2A agents; exposing or updating REST/OpenAPI services through an agent; updating the installed OpenBrain skill; maintaining Open Brain CLI config; managing the local Open Brain crypto wallet; requesting wallet permissions; signing messages; submitting wallet transfers, swaps, or transactions; scheduling daemon-managed agent runtime reloads; or debugging Open Brain gateway connectivity.
 ---
 # Open Brain
 
@@ -17,11 +17,11 @@ Codebase maintenance is a first-class responsibility for this skill: read the ex
    - Read local agent/developer instructions, package metadata, service entrypoints, tests, and configuration files.
    - Find existing REST services, OpenAPI specs, ports, startup commands, and service registration metadata.
    - Identify the smallest code changes needed to make the workspace buildable, testable, and discoverable without replacing established project patterns.
-2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register an agent, expose a service, manage wallet permissions or transactions, schedule a daemon-managed runtime reload, or inspect gateway status.
+2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register or rename an agent, expose a service, update the installed OpenBrain skill, manage wallet permissions or transactions, schedule a daemon-managed runtime reload, or inspect gateway status.
 
    - If `obrain` is not available, install it with `bun install -g @obrain/cli` when the user allows dependency installation.
    - Prefer `obrain ...` for normal usage.
-   - Read `references/cli.md` before running login, daemon, registration, service, reload, wallet, or debug commands.
+   - Read `references/cli.md` before running login, daemon, registration, service, skill, reload, wallet, or debug commands.
    - Read `references/wallet.md` before running wallet info, signing, permission, transfer, or swap commands.
    - Read `references/workspace.md` before maintaining workspace code or registering services discovered from a workspace.
    - When initializing a workspace, automatically generate missing default parameters instead of asking the user for every value. Use the rules in `references/cli.md`.
@@ -40,6 +40,7 @@ Codebase maintenance is a first-class responsibility for this skill: read the ex
 
    - For an OpenCode runtime, register with `agent register --runtime opencode`.
    - Always pass `--name <assistant-name>` when registering. Randomly generate a friendly assistant name with exactly two syllables, such as `Milo`, `Nora`, `Kira`, or `Luma`; do not derive it from the repository or service name unless the user provides a name.
+   - Rename existing agents with `obrain agent rename <agent-id> --name="new name" --describe="new desc"` when the user asks to update the agent name or description.
    - For a local service with an agent card, register using the card URL/path plus `--local-url` as appropriate.
    - Use `agent service register` to attach or replace service definitions on an already registered local-device agent.
    - Use `agent reload [local-url]` only for daemon-managed runtimes; it schedules a delayed runtime restart and coalesces duplicate requests.
@@ -47,6 +48,7 @@ Codebase maintenance is a first-class responsibility for this skill: read the ex
 6. Treat wallet actions as user-authorized operations:
 
    - Confirm the intended agent, asset, chain, amount, recipient, permission, and slippage before transfer or swap commands.
+   - Request and describe wallet authorization as an OpenBrain approval operation: the user should review the pending approve record on the OpenBrain platform and complete the approve action there.
    - Prefer read-only wallet commands first (`wallet info`, `wallet permission list`, or swap `--dry-run`) when state is uncertain.
 
 ## Workspace Initialization Defaults
