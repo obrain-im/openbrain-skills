@@ -1,12 +1,12 @@
 ---
 name: open-brain
-description: Work with Open Brain workspaces, agent-owned codebases, the Open Brain CLI daemon, and service discovery. Use when initializing or maintaining an OpenBrain workspace; inspecting and modifying an existing codebase so its REST services, tests, startup commands, and OpenAPI contracts are correct; registering OpenCode/A2A agents; exposing or updating REST/OpenAPI services through an agent; maintaining Open Brain CLI config; scheduling daemon-managed agent runtime reloads; or debugging Open Brain gateway connectivity.
+description: Work with Open Brain workspaces, agent-owned codebases, the Open Brain CLI daemon, service discovery, and crypto wallet operations. Use when initializing or maintaining an OpenBrain workspace; inspecting and modifying an existing codebase so its REST services, tests, startup commands, and OpenAPI contracts are correct; registering OpenCode/A2A agents; exposing or updating REST/OpenAPI services through an agent; maintaining Open Brain CLI config; managing the local Open Brain crypto wallet; requesting wallet permissions; signing messages; submitting wallet transfers, swaps, or transactions; scheduling daemon-managed agent runtime reloads; or debugging Open Brain gateway connectivity.
 ---
 # Open Brain
 
 ## Overview
 
-Use this skill to maintain an agent-owned OpenBrain workspace and connect it to Open Brain. Open Brain lets local agents register with a gateway, keep a daemon-backed websocket connector alive, expose A2A agent cards, and attach REST/OpenAPI services that the gateway can call or convert into GraphQL.
+Use this skill to maintain an agent-owned OpenBrain workspace and connect it to Open Brain. Open Brain lets local agents register with a gateway, keep a daemon-backed websocket connector alive, expose A2A agent cards, attach REST/OpenAPI services that the gateway can call or convert into GraphQL, and use a local encrypted crypto wallet for signing, transfers, swaps, and agent-associated transactions.
 
 Codebase maintenance is a first-class responsibility for this skill: read the existing repository conventions, keep deterministic service behavior in code, preserve the API boundary between AI orchestration and REST services, update tests and startup paths when behavior changes, and make service discovery state match the code that actually runs.
 
@@ -17,11 +17,12 @@ Codebase maintenance is a first-class responsibility for this skill: read the ex
    - Read local agent/developer instructions, package metadata, service entrypoints, tests, and configuration files.
    - Find existing REST services, OpenAPI specs, ports, startup commands, and service registration metadata.
    - Identify the smallest code changes needed to make the workspace buildable, testable, and discoverable without replacing established project patterns.
-2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register an agent, expose a service, schedule a daemon-managed runtime reload, or inspect gateway status.
+2. Use the Open Brain CLI when the user asks to initialize a workspace, log in, register an agent, expose a service, manage wallet permissions or transactions, schedule a daemon-managed runtime reload, or inspect gateway status.
 
    - If `obrain` is not available, install it with `bun install -g @obrain/cli` when the user allows dependency installation.
    - Prefer `obrain ...` for normal usage.
-   - Read `references/cli.md` before running login, daemon, registration, service, reload, or debug commands.
+   - Read `references/cli.md` before running login, daemon, registration, service, reload, wallet, or debug commands.
+   - Read `references/wallet.md` before running wallet info, signing, permission, transfer, or swap commands.
    - Read `references/workspace.md` before maintaining workspace code or registering services discovered from a workspace.
    - When initializing a workspace, automatically generate missing default parameters instead of asking the user for every value. Use the rules in `references/cli.md`.
 3. Maintain the workspace code before updating gateway-visible state:
@@ -43,6 +44,10 @@ Codebase maintenance is a first-class responsibility for this skill: read the ex
    - Use `agent service register` to attach or replace service definitions on an already registered local-device agent.
    - Use `agent reload [local-url]` only for daemon-managed runtimes; it schedules a delayed runtime restart and coalesces duplicate requests.
    - Run `status`, `agent list`, `agent describe`, and when needed `debug ws` to confirm the daemon, connector, gateway, and agent are healthy.
+6. Treat wallet actions as user-authorized operations:
+
+   - Confirm the intended agent, asset, chain, amount, recipient, permission, and slippage before transfer or swap commands.
+   - Prefer read-only wallet commands first (`wallet info`, `wallet permission list`, or swap `--dry-run`) when state is uncertain.
 
 ## Workspace Initialization Defaults
 
@@ -75,4 +80,5 @@ Do not edit global Open Brain user state unless the task requires it.
 ## References
 
 - Read `references/cli.md` for current CLI commands, daemon behavior, config fields, agent-card URL handling, service registration, and GraphQL gateway behavior.
+- Read `references/wallet.md` for local wallet state, wallet permissions, signing, transfer, and swap commands.
 - Read `references/workspace.md` for workspace maintenance, REST service discovery, API boundary, and completion checks.

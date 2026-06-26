@@ -32,6 +32,13 @@ obrain agent describe <agent-id>
 obrain agent reload [local-url]
 obrain agent service register [--agent-id <agent-id>]
 obrain agent delete <agent-id>
+obrain wallet info
+obrain wallet sign-message [message] [--file <path>] [--agent-id <agent-id>]
+obrain wallet permission request <subject> <quota> <hour|day|week|month> [--agent-id <agent-id>]
+obrain wallet permission info <id>
+obrain wallet permission list [--agent-id <agent-id>] [--limit <1-100>]
+obrain wallet transfer <asset> <amount> <to> [--rpc-url <url>]
+obrain wallet swap <fromAsset> <toToken> <amount> [--rpc-url <url>] [--slippage-bps <bps>] [--dry-run]
 obrain debug ws [--gateway-url <url>] [--token <jwt>] [--timeout <ms>]
 ```
 
@@ -46,7 +53,7 @@ Most user-facing commands call `ensureDaemonIsRunning()`, which starts the daemo
 
 ## Login, Daemon, And Environment
 
-`obrain login` starts the daemon, performs device authorization when no reusable token exists, creates a remote device, stores auth state, and reconnects the daemon connector.
+`obrain login` starts the daemon, performs device authorization when no reusable token exists, creates a remote device, stores auth state, initializes or reuses the local encrypted crypto wallet, syncs wallet state with the gateway, and reconnects the daemon connector.
 
 Login and daemon state are stored in:
 
@@ -84,7 +91,7 @@ Useful environment variables:
 
 `obrain status` prints login state, user ID, device ID, gateway URL, log path, daemon PID, socket path, connector connection state, and registered agent count.
 
-`obrain restart` stops and restarts the background daemon. `obrain logout` clears token, user ID, and device ID from `gateway.json` and reconnects the daemon.
+`obrain restart` stops and restarts the background daemon, then attempts to re-associate the local wallet with agents registered on the current device. `obrain logout` clears token, user ID, and device ID from `gateway.json` and reconnects the daemon.
 
 ## Workspace Initialization
 
@@ -149,12 +156,12 @@ Register a local agent with explicit card and URL:
 obrain agent register --card <agent-card-path> --local-url <local-agent-url>
 ```
 
-The CLI prints the agent ID, name, optional card URL, local URL, gateway URL, and optional creation ID after successful registration.
+The CLI prints the agent ID, name, optional card URL, local URL, gateway URL, wallet address, and optional creation ID after successful registration.
 
 Registration behavior:
 
 - Commands require a login token and device ID; run `obrain login` first unless `agent register --runtime opencode --token <jwt>` is used.
-- Runtime registration starts or reuses a daemon-managed OpenCode A2A runtime, fetches the runtime card at `http://localhost:<port>/.well-known/agent-card.json`, registers the derived local URL with the remote gateway, refreshes the gateway card, and reconnects the daemon.
+- Runtime registration starts or reuses a daemon-managed OpenCode A2A runtime, fetches the runtime card at `http://localhost:<port>/.well-known/agent-card.json`, registers the derived local URL with the remote gateway, associates the local wallet with the agent, refreshes the gateway card, and reconnects the daemon.
 - `agent register <input>` treats the positional as an A2A card location unless `--runtime` is set.
 - `agent register --card <path> --local-url <url>` registers an already running local agent; the card path is used only for preview/metadata, while the local URL is registered.
 - `agent delete <agent-id>` removes the remote agent and stops a daemon-managed runtime when its local URL is managed by this daemon.
@@ -221,6 +228,22 @@ The command scans the workspace directory for `openbrain-service.json`:
 Before registering services, confirm each enabled service URL belongs to the intended registered agent runtime or production-ready local service. Do not register development-only services, temporary dev server ports, mock APIs, test fixtures, or incidental ports discovered while scanning the workspace. `port` must be the latest running service port, and `url` should use that same port for the reachable OpenAPI document.
 
 Use `--agent-id` when the current device has multiple registered agents. The command updates the remote agent service and asks the daemon connector to reconnect.
+
+## Wallet
+
+Use wallet commands to inspect the local encrypted crypto wallet, sign messages, request or inspect permissions, and submit approved transfers, swaps, or transactions:
+
+```bash
+obrain wallet info
+obrain wallet sign-message [message] [--file <path>] [--agent-id <agent-id>]
+obrain wallet permission request <subject> <quota> <hour|day|week|month> [--agent-id <agent-id>]
+obrain wallet permission info <id>
+obrain wallet permission list [--agent-id <agent-id>] [--limit <1-100>]
+obrain wallet transfer <asset> <amount> <to> [--rpc-url <url>]
+obrain wallet swap <fromAsset> <toToken> <amount> [--rpc-url <url>] [--slippage-bps <bps>] [--dry-run]
+```
+
+Read `references/wallet.md` before running wallet commands, especially transfer or swap commands.
 
 ## GraphQL Gateway Behavior
 

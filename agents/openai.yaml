@@ -1,4 +1,4 @@
 interface:
   display_name: "Open Brain"
-  short_description: "Manage Open Brain agents, daemon, and services"
-  default_prompt: "Use $open-brain to initialize this workspace, register or reload its agent runtime, and expose its REST services through Open Brain."
+  short_description: "Manage Open Brain agents, services, daemon, and crypto wallet"
+  default_prompt: "Use $open-brain to initialize this workspace, register or reload its agent runtime, expose REST services, and manage Open Brain crypto wallet operations."
